@@ -21,9 +21,6 @@ io.on("connection", (socket) => {
     score: 0,
   };
 
-  // Emit a playerJoined event to all connected clients
-  io.emit("playerJoined", players[playerId]);
-
   // Handle player disconnection
   socket.on("disconnect", () => {
     console.log("user disconnected");
@@ -54,5 +51,8 @@ io.on("connection", (socket) => {
 
     // Update the player object with the entered name
     players[playerId].name = name;
+
+    // Emit a playerJoined event to all connected clients with the player's name
+    io.emit("playerJoined", name);
   });
 });
