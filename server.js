@@ -25,11 +25,11 @@ io.on("connection", (socket) => {
   socket.on("disconnect", () => {
     console.log("user disconnected");
 
+    // Emit a playerLeft event to all connected clients
+    io.emit("playerLeft", players[playerId].name);
+
     // Remove the player from the list of players
     delete players[playerId];
-
-    // Emit a playerLeft event to all connected clients
-    io.emit("playerLeft", playerId);
   });
 
   let firstPlayer = null;
@@ -39,7 +39,7 @@ io.on("connection", (socket) => {
 
     // Keep track of the first player to press the button
     if (firstPlayer === null) {
-      firstPlayer = playerId;
+      firstPlayer = players[playerId].name;
 
       // Emit a firstPlayer event to all connected clients, including the host
       io.emit("firstPlayer", firstPlayer);
