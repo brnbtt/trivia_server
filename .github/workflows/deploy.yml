@@ -29,7 +29,7 @@ jobs:
     - name: Deploy to Azure Web App
       uses: azure/webapps-deploy@v2
       with:
-        app-name: 'trivia-client'
+        app-name: 'trivia-server'
         slot-name: 'production' # optional if you have no slots
         images: ${{ secrets.DOCKER_USERNAME }}.azurecr.io/my-app:${{ github.sha }}
 
