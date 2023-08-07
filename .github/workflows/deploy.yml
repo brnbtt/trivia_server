@@ -1,0 +1,37 @@
+name: CI and Deploy to Azure
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Login to Azure
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: Login to ACR
+      run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login ${{ secrets.DOCKER_USERNAME }}.azurecr.io -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
+
+    - name: Build and push Docker image
+      run: |
+        docker build -t ${{ secrets.DOCKER_USERNAME }}.azurecr.io/my-app:${{ github.sha }} .
+        docker push ${{ secrets.DOCKER_USERNAME }}.azurecr.io/my-app:${{ github.sha }}
+
+    - name: Deploy to Azure Web App
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: 'trivia-client'
+        slot-name: 'production' # optional if you have no slots
+        images: ${{ secrets.DOCKER_USERNAME }}.azurecr.io/my-app:${{ github.sha }}
+
+    - name: Logout from Azure
+      run: az logout
